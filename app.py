@@ -150,7 +150,8 @@ page = st.sidebar.radio(
         "🌳 Decision Tree",
         "🧠 Naive Bayes",
         "📈 Regression",
-        "🎯 K-Means Clustering"
+        "🎯 K-Means Clustering",
+        "📋 Comparison"
     ]
 )
 
@@ -981,7 +982,291 @@ elif page == "🎯 K-Means Clustering":
     st.success(
         "K-Means clustering completed successfully."
     )
+# ---------------------------------------------------------
+# COMPARISON
+# ---------------------------------------------------------
 
+elif page == "📋 Comparison":
+
+    st.markdown(
+        '<div class="section-title">Algorithm Comparison</div>',
+        unsafe_allow_html=True
+    )
+
+    st.write(
+        "Comparison of the data mining techniques used in the "
+        "IT Helpdesk Analytics project."
+    )
+
+    # Decision Tree
+    df_model = df.copy()
+
+    df_model["Response_Time"] = (
+        df_model["Response_Time"]
+        .fillna(df_model["Response_Time"].mean())
+    )
+
+    df_model["Customer_Satisfaction"] = (
+        df_model["Customer_Satisfaction"]
+        .fillna(df_model["Customer_Satisfaction"].mean())
+    )
+
+    classification_features = [
+        "Department",
+        "Issue_Type",
+        "Device_Type",
+        "Technician",
+        "Response_Time",
+        "Resolution_Time",
+        "Status",
+        "Reopened",
+        "Customer_Satisfaction",
+        "Number_of_Interactions"
+    ]
+
+    X = pd.get_dummies(df_model[classification_features])
+    y = df_model["Priority"]
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.20,
+        random_state=42,
+        stratify=y
+    )
+
+    tree = DecisionTreeClassifier(
+        random_state=42,
+        max_depth=5
+    )
+
+    tree.fit(X_train, y_train)
+
+    tree_pred = tree.predict(X_test)
+
+    tree_accuracy = accuracy_score(
+        y_test,
+        tree_pred
+    )
+
+    # Naive Bayes
+    nb = GaussianNB()
+
+    nb.fit(X_train, y_train)
+
+    nb_pred = nb.predict(X_test)
+
+    nb_accuracy = accuracy_score(
+        y_test,
+        nb_pred
+    )
+
+    # Linear Regression
+    regression_features = [
+        "Department",
+        "Issue_Type",
+        "Device_Type",
+        "Priority",
+        "Response_Time",
+        "Status",
+        "Reopened",
+        "Customer_Satisfaction",
+        "Number_of_Interactions"
+    ]
+
+    X_reg = pd.get_dummies(
+        df_model[regression_features]
+    )
+
+    y_reg = df_model["Resolution_Time"]
+
+    X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(
+        X_reg,
+        y_reg,
+        test_size=0.20,
+        random_state=42
+    )
+
+    regression = LinearRegression()
+
+    regression.fit(
+        X_train_reg,
+        y_train_reg
+    )
+
+    regression_pred = regression.predict(
+        X_test_reg
+    )
+
+    regression_mse = mean_squared_error(
+        y_test_reg,
+        regression_pred
+    )
+
+    regression_r2 = r2_score(
+        y_test_reg,
+        regression_pred
+    )
+
+    # K-Means
+    clustering_features = [
+        "Response_Time",
+        "Resolution_Time",
+        "Customer_Satisfaction",
+        "Number_of_Interactions"
+    ]
+
+    X_cluster = df_model[clustering_features]
+
+    scaler = StandardScaler()
+
+    X_scaled = scaler.fit_transform(
+        X_cluster
+    )
+
+    kmeans = KMeans(
+        n_clusters=3,
+        random_state=42,
+        n_init=10
+    )
+
+    clusters = kmeans.fit_predict(X_scaled)
+
+    silhouette = silhouette_score(
+        X_scaled,
+        clusters
+    )
+
+    # Apriori
+    apriori_data = df[
+        [
+            "Department",
+            "Issue_Type",
+            "Device_Type",
+            "Priority"
+        ]
+    ]
+
+    basket = pd.get_dummies(
+        apriori_data
+    )
+
+    frequent_itemsets = apriori(
+        basket,
+        min_support=0.05,
+        use_colnames=True
+    )
+
+    rules = association_rules(
+        frequent_itemsets,
+        metric="confidence",
+        min_threshold=0.60
+    )
+
+    highest_lift = rules["lift"].max()
+
+    # Comparison table
+    comparison = pd.DataFrame({
+        "Algorithm": [
+            "Apriori",
+            "Decision Tree",
+            "Naive Bayes",
+            "Linear Regression",
+            "K-Means"
+        ],
+        "Type": [
+            "Association Mining",
+            "Classification",
+            "Classification",
+            "Regression",
+            "Clustering"
+        ],
+        "Primary Metric": [
+            "Highest Lift",
+            "Accuracy",
+            "Accuracy",
+            "R² Score",
+            "Silhouette Score"
+        ],
+        "Value": [
+            round(highest_lift, 3),
+            round(tree_accuracy * 100, 2),
+            round(nb_accuracy * 100, 2),
+            round(regression_r2, 4),
+            round(silhouette, 3)
+        ]
+    })
+
+    st.subheader("Overall Comparison")
+
+    st.dataframe(
+        comparison,
+        width="stretch",
+        hide_index=True
+    )
+
+    st.markdown("---")
+
+    st.subheader("Classification Comparison")
+
+    classification_comparison = pd.DataFrame({
+        "Algorithm": [
+            "Decision Tree",
+            "Naive Bayes"
+        ],
+        "Accuracy": [
+            tree_accuracy * 100,
+            nb_accuracy * 100
+        ]
+    })
+
+    st.bar_chart(
+        classification_comparison.set_index("Algorithm")
+    )
+
+    st.markdown("---")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("Regression Performance")
+
+        st.metric(
+            "R² Score",
+            f"{regression_r2:.4f}"
+        )
+
+        st.metric(
+            "Mean Squared Error",
+            f"{regression_mse:.2f}"
+        )
+
+    with col2:
+        st.subheader("Clustering Performance")
+
+        st.metric(
+            "Silhouette Score",
+            f"{silhouette:.3f}"
+        )
+
+        st.metric(
+            "Number of Clusters",
+            "3"
+        )
+
+    st.markdown("---")
+
+    st.subheader("Apriori Performance")
+
+    st.metric(
+        "Highest Lift",
+        f"{highest_lift:.3f}"
+    )
+
+    st.info(
+        "Higher values are generally better for classification accuracy, "
+        "R² score, lift and silhouette score. MSE is better when lower."
+    )
 
 # ---------------------------------------------------------
 # FOOTER
