@@ -33,73 +33,74 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-.main {
-    background-color: #f7f9fc;
+.stApp {
+    background-color: #FFF7ED;
 }
 
-.block-container {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+section[data-testid="stSidebar"] {
+    background-color: #3B1F2B;
 }
 
-.dashboard-title {
-    font-size: 38px;
-    font-weight: 700;
-    color: #17365D;
-    margin-bottom: 5px;
+section[data-testid="stSidebar"] * {
+    color: #FFF7ED !important;
 }
 
-.dashboard-subtitle {
-    font-size: 17px;
-    color: #5B6573;
-    margin-bottom: 25px;
+h1, h2, h3 {
+    color: #3B1F2B !important;
 }
 
-.section-title {
-    font-size: 25px;
-    font-weight: 650;
-    color: #17365D;
-    margin-top: 10px;
-    margin-bottom: 15px;
-}
-
-.metric-card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #E2E8F0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+p, label, span, div {
+    color: #4A3A40;
 }
 
 div[data-testid="stMetric"] {
-    background-color: white;
-    border: 1px solid #E2E8F0;
-    padding: 15px;
+    background-color: #FFFFFF;
+    border: 2px solid #F28C7A;
     border-radius: 12px;
+    padding: 15px;
 }
 
 div[data-testid="stMetric"] label {
-    color: #475569 !important;
+    color: #7A5C61 !important;
 }
 
 div[data-testid="stMetric"] [data-testid="stMetricValue"] {
-    color: #17365D !important;
+    color: #C94C4C !important;
 }
 
 div[data-testid="stMetric"] [data-testid="stMetricDelta"] {
-    color: #475569 !important;
+    color: #7A5C61 !important;
 }
 
-.stButton button {
+.stButton > button {
+    background-color: #E76F51 !important;
+    color: white !important;
+    border: none !important;
     border-radius: 8px;
+    font-weight: 600;
 }
 
-[data-testid="stSidebar"] {
-    background-color: #17365D;
+.stButton > button:hover {
+    background-color: #C94C4C !important;
+    color: white !important;
 }
 
-[data-testid="stSidebar"] * {
-    color: white;
+div[data-baseweb="select"] > div {
+    background-color: #FFFFFF !important;
+    border-color: #E9AFA3 !important;
+}
+
+div[data-testid="stDataFrame"] {
+    border: 1px solid #E9AFA3;
+    border-radius: 10px;
+}
+
+div[data-testid="stAlert"] {
+    border-radius: 10px;
+}
+
+hr {
+    border-color: #E9AFA3 !important;
 }
 </style>
 """, unsafe_allow_html=True)
